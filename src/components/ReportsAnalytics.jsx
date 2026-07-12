@@ -1,7 +1,7 @@
 import React from 'react';
 import { Download, TrendingUp, Fuel, BarChart3, DollarSign, Activity } from 'lucide-react';
 
-export default function ReportsAnalytics({ vehicles, trips, fuelLogs, expenses, maintenanceLogs }) {
+export default function ReportsAnalytics({ vehicles, trips, fuelLogs, expenses, maintenanceLogs, activeCurrencySymbol = '$' })  {
   
   // --- Core Calculation Matrix Engine matching Mockup Formulas ---
   const totalFuelCost = fuelLogs.reduce((sum, f) => sum + (Number(f.cost) || 0), 0);
