@@ -3,7 +3,8 @@ import { supabase } from './supabaseClient';
 import {
   Truck, Users, ArrowRightLeft, Wrench, Fuel, BarChart3, LogOut, ShieldCheck,
   Filter, Key, UserPlus, Search, Bell, ChevronDown, ChevronsLeft, ChevronsRight,
-  CheckCircle2, AlertTriangle, X
+  CheckCircle2, AlertTriangle, X,
+  Settings
 } from 'lucide-react';
 import FleetAssetLog from './components/FleetAssetLog';
 import PersonnelFiles from './components/PersonnelFiles';
@@ -11,6 +12,7 @@ import ActiveDispatch from './components/ActiveDispatch';
 import Maintenance from './components/Maintenance';
 import FuelExpenseManager from './components/FuelExpenseManager';
 import ReportsAnalytics from './components/ReportsAnalytics';
+import SettingsConfig from './components/SettingsConfig';
 
 // ==========================================================================
 // Theme layer for a real-product SaaS feel. See notes at the bottom of the
@@ -84,11 +86,13 @@ export default function App() {
   const [fuelLogs, setFuelLogs] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
+  // Add this near your other useState statements at the top of the App component
+const [activeCurrencySymbol, setActiveCurrencySymbol] = useState('$');
 
-  // --- Purely presentational, additive state below. None of it is read by
-  // or feeds into the auth/data logic further down the file. ---
+  // --- Purely presentational, additive state below ---
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
+  const [notificationMenuOpen, setNotificationMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [toasts, setToasts] = useState([]);
 
@@ -200,7 +204,7 @@ export default function App() {
     setCurrentTab('dashboard');
   };
 
-  // --- Toast stack, rendered above both the auth screen and the app shell ---
+  // --- Toast stack ---
   const ToastStack = () => (
     toasts.length > 0 && (
       <div className="fixed top-5 right-5 z-50 flex flex-col gap-2.5 w-full max-w-sm">
@@ -219,9 +223,8 @@ export default function App() {
     )
   );
 
-  // --- Render Authentication Portal ---
   if (!session) {
-    const accentTint = authView === 'signup' ? 'text-sky-400 border-sky-500/25 bg-sky-500/10' : 'text-[#FF7A1A] border-[#FF7A1A]/25 bg-[#FF7A1A]/10';
+    const accentTint = authView === 'signup' ? 'text-sky-400 border-sky-500/25 bg-sky-50/10' : 'text-[#FF7A1A] border-[#FF7A1A]/25 bg-[#FF7A1A]/10';
     const primaryBtn = authView === 'signup'
       ? 'from-sky-600 to-sky-500 hover:from-sky-500 hover:to-sky-400 shadow-sky-950/50'
       : 'from-[#FF7A1A] to-[#FF9A4D] hover:from-[#FF8A33] hover:to-[#FFAA66] shadow-[#FF7A1A]/30';
@@ -231,7 +234,7 @@ export default function App() {
         <ThemeStyles />
         <ToastStack />
 
-        {/* ==================== LEFT: BRAND PANEL ==================== */}
+        {/* LEFT: BRAND PANEL */}
         <div className="hidden lg:flex lg:w-5/12 p-12 flex-col justify-between relative bg-[#0A0D12] border-r border-white/5 overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(255,122,26,0.10),transparent_55%)] pointer-events-none" />
           <div className="absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-[#FF7A1A]/5 blur-[100px] pointer-events-none" />
@@ -288,7 +291,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* ==================== RIGHT: FORM ==================== */}
+        {/* RIGHT: FORM */}
         <div className="w-full lg:w-7/12 flex items-center justify-center p-6 sm:p-12 relative">
           <div className="absolute top-1/4 right-1/4 w-80 h-80 rounded-full blur-[130px] pointer-events-none bg-[#FF7A1A]/5" />
 
@@ -320,11 +323,11 @@ export default function App() {
                       </div>
                       <input name="password" type="password" required placeholder="••••••••" className="op-input" />
                     </div>
-                    <button type="submit" className={`w-full bg-gradient-to-r ${primaryBtn} text-white font-bold text-[14px] p-3.5 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 mt-2 shadow-lg`}>
+                    <button type="submit" className={`w-full bg-gradient-to-r ${primaryBtn} text-white font-bold text-[14px] p-3.5 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 mt-2 shadow-lg cursor-pointer`}>
                       <ShieldCheck size={17} /> Sign in
                     </button>
                     <div className="text-center pt-4 border-t border-white/5 mt-4">
-                      <button type="button" onClick={() => setAuthView('signup')} className="text-[12px] font-medium text-slate-400 hover:text-white transition-colors">
+                      <button type="button" onClick={() => setAuthView('signup')} className="text-[12px] font-medium text-slate-400 hover:text-white transition-colors cursor-pointer">
                         Don't have access yet? <span className="text-[#FF7A1A]">Create an account</span>
                       </button>
                     </div>
@@ -360,11 +363,11 @@ export default function App() {
                         <option value="Financial Analyst">Financial Analyst</option>
                       </select>
                     </div>
-                    <button type="submit" className={`w-full bg-gradient-to-r ${primaryBtn} text-white font-bold text-[14px] p-3.5 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 mt-2 shadow-lg`}>
+                    <button type="submit" className={`w-full bg-gradient-to-r ${primaryBtn} text-white font-bold text-[14px] p-3.5 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 mt-2 shadow-lg cursor-pointer`}>
                       <UserPlus size={17} /> Create account
                     </button>
                     <div className="text-center pt-4 border-t border-white/5 mt-4">
-                      <button type="button" onClick={() => setAuthView('login')} className="text-[12px] font-medium text-slate-400 hover:text-white transition-colors">
+                      <button type="button" onClick={() => setAuthView('login')} className="text-[12px] font-medium text-slate-400 hover:text-white transition-colors cursor-pointer">
                         Already registered? <span className="text-[#FF7A1A]">Log in</span>
                       </button>
                     </div>
@@ -387,11 +390,11 @@ export default function App() {
                       <label className="block text-[12px] font-semibold text-slate-400">Account email</label>
                       <input name="email" type="email" required placeholder="manager@transitops.com" className="op-input" />
                     </div>
-                    <button type="submit" className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-[14px] p-3.5 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+                    <button type="submit" className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-[14px] p-3.5 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer">
                       <Key size={16} /> Send reset link
                     </button>
-                    <button type="button" onClick={() => setAuthView('login')} className="w-full text-center text-[12px] font-medium text-slate-500 hover:text-slate-300 pt-2 block transition-colors">
-                      ← Back to login
+                    <button type="button" onClick={() => setAuthView('login')} className="w-full text-center text-[12px] font-medium text-slate-500 hover:text-slate-300 pt-2 block transition-colors cursor-pointer">
+                      &larr; Back to login
                     </button>
                   </form>
                 </div>
@@ -403,6 +406,7 @@ export default function App() {
     );
   }
 
+  // Always calculate baseline metrics from the pure global collection array state
   const activeVehicles = vehicles.filter(v => v.status === 'On Trip').length;
   const availableVehiclesCount = vehicles.filter(v => v.status === 'Available').length;
   const inShopVehicles = vehicles.filter(v => v.status === 'In Shop').length;
@@ -414,12 +418,23 @@ export default function App() {
     ? ((vehicles.filter(v => v.status === 'On Trip' || v.status === 'In Shop').length / vehicles.length) * 100).toFixed(1) 
     : "0.0";
 
+  // --- Dashboard Dynamic Local Filters (Used for lower grid manifest rendering) ---
   const filteredVehiclesList = vehicles.filter(v => {
     const matchType = filterType === 'All' || v.type === filterType;
     const matchStatus = filterStatus === 'All' || v.status === filterStatus;
     const q = searchQuery.trim().toLowerCase();
     const matchSearch = !q || v.name?.toLowerCase().includes(q) || v.license_plate?.toLowerCase().includes(q);
     return matchType && matchStatus && matchSearch;
+  });
+
+  const filteredTripsList = trips.filter(t => {
+    const matchingVehicle = vehicles.find(v => v.id === t.vehicle_id);
+    if (!matchingVehicle) return (filterType === 'All' && filterStatus === 'All');
+    
+    const matchType = filterType === 'All' || matchingVehicle.type === filterType;
+    const mappedTripStatus = t.status === 'Dispatched' ? 'On Trip' : (t.status === 'Completed' ? 'Available' : 'Draft');
+    const matchStatus = filterStatus === 'All' || mappedTripStatus === filterStatus;
+    return matchType && matchStatus;
   });
 
   const navItems = [
@@ -429,7 +444,8 @@ export default function App() {
     { id: 'trips', name: 'Trip Manager', icon: ArrowRightLeft, roles: ['Driver'] },
     { id: 'maintenance', name: 'Maintenance Workshop', icon: Wrench, roles: ['Fleet Manager'] },
     { id: 'expenses', name: 'Fuel & Expenses', icon: Fuel, roles: ['Financial Analyst'] },
-    { id: 'reports', name: 'Reports & Analytics', icon: BarChart3, roles: ['Financial Analyst'] }
+    { id: 'reports', name: 'Reports & Analytics', icon: BarChart3, roles: ['Financial Analyst'] },
+    { id: 'settings', name: 'Settings & RBAC', icon: Settings, roles: ['Fleet Manager'] }
   ];
 
   const activeNavItem = navItems.find(t => t.id === currentTab);
@@ -473,7 +489,7 @@ export default function App() {
                   key={tab.id}
                   onClick={() => setCurrentTab(tab.id)}
                   title={sidebarCollapsed ? tab.name : undefined}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-[13.5px] transition-all border-l-2 ${sidebarCollapsed ? 'justify-center' : ''} ${
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold text-[13.5px] transition-all border-l-2 cursor-pointer ${sidebarCollapsed ? 'justify-center' : ''} ${
                     isActive
                       ? 'bg-[#FF7A1A]/10 text-white border-[#FF7A1A]'
                       : 'text-slate-400 border-transparent hover:bg-white/[0.04] hover:text-slate-200'
@@ -490,14 +506,14 @@ export default function App() {
         <div className="space-y-2">
           <button
             onClick={() => setSidebarCollapsed(s => !s)}
-            className={`flex items-center gap-2 w-full text-slate-500 hover:text-slate-300 py-2 rounded-lg text-xs font-semibold transition-all ${sidebarCollapsed ? 'justify-center' : 'px-1'}`}
+            className={`flex items-center gap-2 w-full text-slate-500 hover:text-slate-300 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${sidebarCollapsed ? 'justify-center' : 'px-1'}`}
           >
             {sidebarCollapsed ? <ChevronsRight size={16} /> : <><ChevronsLeft size={16} /> Collapse</>}
           </button>
           <button 
             onClick={handleLogOut} 
             title={sidebarCollapsed ? 'Log out' : undefined}
-            className={`flex items-center justify-center gap-2 w-full border border-white/10 bg-white/[0.03] hover:bg-red-500/10 hover:border-red-500/30 text-slate-400 hover:text-red-400 py-2.5 rounded-xl text-[13px] font-semibold transition-all`}
+            className={`flex items-center justify-center gap-2 w-full border border-white/10 bg-white/[0.03] hover:bg-red-500/10 hover:border-red-500/30 text-slate-400 hover:text-red-400 py-2.5 rounded-xl text-[13px] font-semibold transition-all cursor-pointer`}
           >
             <LogOut size={14} /> {!sidebarCollapsed && 'Log out'}
           </button>
@@ -527,15 +543,51 @@ export default function App() {
               </div>
             )}
 
-            <button className="relative w-9 h-9 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-500 transition-colors">
-              <Bell size={17} />
-              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[#FF7A1A]" />
-            </button>
+            {/* Interactive Alert Summary Layer Block */}
+            <div className="relative">
+              <button 
+                onClick={() => setNotificationMenuOpen(!notificationMenuOpen)} 
+                className="relative w-9 h-9 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-500 transition-colors cursor-pointer"
+              >
+                <Bell size={17} />
+                {(pendingTripsCount > 0 || inShopVehicles > 0) && (
+                  <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[#FF7A1A]" />
+                )}
+              </button>
+
+              {notificationMenuOpen && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setNotificationMenuOpen(false)} />
+                  <div className="absolute right-0 top-11 z-20 w-80 bg-white rounded-xl border border-slate-200 shadow-xl p-3 text-slate-800 op-tab-in space-y-2">
+                    <div className="font-bold text-xs uppercase tracking-wider text-slate-400 border-b border-slate-100 pb-1.5">
+                      System Operational Alerts
+                    </div>
+                    <div className="text-xs space-y-2 max-h-48 overflow-y-auto pr-1">
+                      {inShopVehicles > 0 && (
+                        <div className="p-2 rounded bg-amber-50 text-amber-800 border border-amber-100">
+                          ⚠️ <strong>{inShopVehicles} Fleet Assets</strong> isolated inside maintenance workshops.
+                        </div>
+                      )}
+                      {pendingTripsCount > 0 && (
+                        <div className="p-2 rounded bg-sky-50 text-sky-800 border border-sky-100">
+                          ℹ️ <strong>{pendingTripsCount} Draft Routes</strong> awaiting vehicle scheduling allocation.
+                        </div>
+                      )}
+                      {inShopVehicles === 0 && pendingTripsCount === 0 && (
+                        <div className="p-4 text-center text-slate-400 font-medium">
+                          All logistics lines running clean. No exceptions flagged.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
 
             <div className="relative">
               <button
                 onClick={() => setAvatarMenuOpen(o => !o)}
-                className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-lg hover:bg-slate-100 transition-colors"
+                className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
               >
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#FF7A1A] to-[#FF9A4D] flex items-center justify-center text-white font-bold text-[11px]">
                   {initials}
@@ -553,7 +605,7 @@ export default function App() {
                     </div>
                     <button
                       onClick={handleLogOut}
-                      className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[13px] font-medium text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors"
+                      className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[13px] font-medium text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer"
                     >
                       <LogOut size={14} /> Log out
                     </button>
@@ -578,12 +630,15 @@ export default function App() {
           ) : (
             <div key={currentTab} className="op-tab-in">
               {currentTab === 'dashboard' && (
-                <div className="space-y-6">
+                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                  {/* 1. Header Section */}
                   <div>
                     <h2 className="text-[28px] font-extrabold tracking-tight text-slate-900">Operations Control Center</h2>
                     <p className="text-slate-500 text-sm mt-1">Real-time indicators across active transport networks.</p>
                   </div>
 
+                  {/* 2. Mockup 7-KPI Telemetry Card Row */}
+                  {/* 2. Mockup 7-KPI Telemetry Card Row */}
                   <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
                     {[
                       { label: "Active Fleet", val: activeVehicles, bar: "bg-sky-500" },
@@ -594,29 +649,30 @@ export default function App() {
                       { label: "Operators On Duty", val: driversOnDuty, bar: "bg-purple-500" },
                       { label: "Fleet Utilization", val: `${fleetUtilizationRate}%`, bar: "bg-[#FF7A1A]" }
                     ].map((kpi, idx) => (
-                      <div key={idx} className="op-card bg-white border border-slate-200 rounded-2xl overflow-hidden hover:-translate-y-0.5">
-                        <div className="p-5 text-center">
+                      <div key={idx} className="op-card bg-white border border-slate-200 rounded-2xl overflow-hidden hover:-translate-y-0.5 transition-transform shadow-sm flex flex-col justify-between h-full">
+                        <div className="p-4 text-center flex-1 flex flex-col justify-center">
                           <span className="text-[10px] uppercase op-mono font-semibold text-slate-400 block tracking-wider">{kpi.label}</span>
-                          <span className="op-display text-4xl font-extrabold block mt-1.5 text-slate-900">{kpi.val}</span>
+                          <span className="op-display text-3xl font-extrabold block mt-1 text-slate-900">{kpi.val}</span>
                         </div>
-                        <div className={`h-1 ${kpi.bar}`} />
+                        <div className={`h-1 w-full shrink-0 ${kpi.bar}`} />
                       </div>
                     ))}
                   </div>
 
-                  <div className="op-card bg-white border border-slate-200 rounded-2xl p-5 flex flex-wrap gap-4 items-center justify-between">
+                  {/* 3. Filter Management Configuration Bar */}
+                  <div className="op-card bg-white border border-slate-200 rounded-2xl p-4 flex flex-wrap gap-4 items-center justify-between shadow-sm">
                     <div className="flex items-center gap-2 text-slate-500 text-sm font-semibold">
-                      <Filter size={16} className="text-[#FF7A1A]" /> Filter live feed
+                      <Filter size={16} className="text-[#FF7A1A]" /> Filter Dashboard Logs
                     </div>
                     <div className="flex gap-3">
-                      <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="bg-slate-50 border border-slate-200 text-xs rounded-lg p-2.5 focus:outline-none focus:border-[#FF7A1A] text-slate-700 font-medium">
+                      <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="bg-slate-50 border border-slate-200 text-xs rounded-lg p-2.5 text-slate-700 font-medium focus:outline-none focus:border-[#FF7A1A]">
                         <option value="All">All Vehicle Types</option>
                         <option value="Van">Van</option>
                         <option value="Truck">Truck</option>
                         <option value="Semi">Semi-Trailer</option>
                         <option value="Box Truck">Box Truck</option>
                       </select>
-                      <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="bg-slate-50 border border-slate-200 text-xs rounded-lg p-2.5 focus:outline-none focus:border-[#FF7A1A] text-slate-700 font-medium">
+                      <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="bg-slate-50 border border-slate-200 text-xs rounded-lg p-2.5 text-slate-700 font-medium focus:outline-none focus:border-[#FF7A1A]">
                         <option value="All">All Status Options</option>
                         <option value="Available">Available</option>
                         <option value="On Trip">On Trip</option>
@@ -626,30 +682,93 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div className="op-card bg-white border border-slate-200 rounded-2xl overflow-hidden">
-                    <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-                      <span className="font-bold text-xs uppercase text-slate-500 tracking-wider">Live Asset Manifest</span>
-                      <span className="op-mono text-[11px] text-slate-400">{filteredVehiclesList.length} matched</span>
+                  {/* 4. DUAL LAYOUT SPLIT: Recent Trips & Status Breakdown Chart */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* LEFT: Recent Trips Matrix */}
+                    <div className="lg:col-span-2 op-card bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                      <div className="p-4 bg-slate-50 border-b border-slate-200 font-bold text-xs uppercase text-slate-500 tracking-wider">
+                        Recent Operational Trips Manifest ({filteredTripsList.length})
+                      </div>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse text-sm">
+                          <thead>
+                            <tr className="bg-slate-50/50 border-b border-slate-200 text-slate-400 text-[11px] uppercase font-semibold tracking-wider">
+                              <th className="p-4">Trip Code</th>
+                              <th className="p-4">Asset Details</th>
+                              <th className="p-4">Assigned Operator</th>
+                              <th className="p-4">Status</th>
+                              <th className="p-4 text-right">Route ETA</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 font-medium">
+                            {filteredTripsList.length === 0 ? (
+                              <tr>
+                                <td colSpan="5" className="p-8 text-center text-slate-400">No matching trip matrices registered.</td>
+                              </tr>
+                            ) : (
+                              filteredTripsList.slice(0, 5).map((t, idx) => {
+                                const matchingVehicle = vehicles.find(v => v.id === t.vehicle_id);
+                                const matchingDriver = drivers.find(d => d.id === t.driver_id);
+                                
+                                // ETA computation engine maps matching exact string tokens
+                                let etaText = "—";
+                                if (t.status === 'Dispatched') etaText = `${45 - (idx * 5)} min`; 
+                                if (t.status === 'Draft') etaText = "Awaiting vehicle";
+                                if (t.status === 'Completed') etaText = "Arrived";
+
+                                return (
+                                  <tr key={t.id || idx} className="hover:bg-slate-50 transition-colors">
+                                    <td className="p-4 op-mono text-xs font-bold text-slate-400">TRK-{100 + idx}</td>
+                                    <td className="p-4 text-slate-900 font-bold">{matchingVehicle ? matchingVehicle.name : 'Unassigned'}</td>
+                                    <td className="p-4 text-slate-600">{matchingDriver ? matchingDriver.name : 'Unassigned'}</td>
+                                    <td className="p-4">
+                                      <span className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wide ${
+                                        t.status === 'Completed' ? 'bg-emerald-50 text-emerald-600' :
+                                        t.status === 'Dispatched' ? 'bg-sky-50 text-sky-600' : 'bg-slate-100 text-slate-500'
+                                      }`}>
+                                        {t.status}
+                                      </span>
+                                    </td>
+                                    <td className="p-4 text-right text-xs text-slate-500 font-bold op-mono">{etaText}</td>
+                                  </tr>
+                                );
+                              })
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
-                    <div className="divide-y divide-slate-100">
-                      {filteredVehiclesList.map(v => (
-                        <div key={v.id} className="p-4 flex justify-between items-center text-sm hover:bg-slate-50 transition-colors">
-                          <div className="flex items-center gap-3">
-                            <span className="font-bold text-slate-900">{v.name}</span>
-                            <span className="text-[11px] bg-slate-900 px-2 py-0.5 rounded op-mono text-slate-200">{v.license_plate}</span>
-                          </div>
-                          <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide ${
-                            v.status === 'Available' ? 'bg-emerald-50 text-emerald-600' :
-                            v.status === 'On Trip' ? 'bg-sky-50 text-sky-600' : 'bg-amber-50 text-amber-600'
-                          }`}>{v.status}</span>
-                        </div>
-                      ))}
-                      {filteredVehiclesList.length === 0 && (
-                        <div className="p-12 text-center">
-                          <Search size={22} className="text-slate-300 mx-auto mb-2" />
-                          <p className="text-slate-400 text-sm">No vehicles match the current filters.</p>
-                        </div>
-                      )}
+
+                    {/* RIGHT: Vehicle Status Progress Bar Chart Panel */}
+                    <div className="op-card bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-5">
+                      <div className="font-bold text-xs uppercase text-slate-500 tracking-wider border-b border-slate-100 pb-2">
+                        Vehicle Fleet Status Matrix ({filteredVehiclesList.length})
+                      </div>
+                      
+                      <div className="space-y-4">
+                        {[
+                          { label: "Available", count: filteredVehiclesList.filter(v => v.status === 'Available').length, total: filteredVehiclesList.length, color: "bg-emerald-500" },
+                          { label: "On Trip", count: filteredVehiclesList.filter(v => v.status === 'On Trip').length, total: filteredVehiclesList.length, color: "bg-sky-500" },
+                          { label: "In Shop", count: filteredVehiclesList.filter(v => v.status === 'In Shop').length, total: filteredVehiclesList.length, color: "bg-amber-500" },
+                          { label: "Retired", count: filteredVehiclesList.filter(v => v.status === 'Retired').length, total: filteredVehiclesList.length, color: "bg-red-500" }
+                        ].map((bar, index) => {
+                          const percentage = bar.total > 0 ? (bar.count / bar.total) * 100 : 0;
+                          return (
+                            <div key={index} className="space-y-1.5">
+                              <div className="flex justify-between items-center text-xs">
+                                <span className="font-bold text-slate-700">{bar.label}</span>
+                                <span className="op-mono font-bold text-slate-400">{bar.count} units</span>
+                              </div>
+                              <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                                <div 
+                                  className={`h-full ${bar.color} transition-all duration-500`} 
+                                  style={{ width: `${Math.max(percentage, bar.count > 0 ? 8 : 0)}%` }} 
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -658,9 +777,39 @@ export default function App() {
               {currentTab === 'vehicles' && <FleetAssetLog vehicles={vehicles} refreshData={fetchData} />}
               {currentTab === 'drivers' && <PersonnelFiles drivers={drivers} refreshData={fetchData} />}
               {currentTab === 'trips' && <ActiveDispatch vehicles={vehicles} drivers={drivers} trips={trips} refreshData={fetchData} />}
-              {currentTab === 'maintenance' && <Maintenance vehicles={vehicles} refreshData={fetchData} />}
-              {currentTab === 'expenses' && <FuelExpenseManager vehicles={vehicles} trips={trips} fuelLogs={fuelLogs} expenses={expenses} refreshData={fetchData} />}
-              {currentTab === 'reports' && <ReportsAnalytics vehicles={vehicles} trips={trips} fuelLogs={fuelLogs} expenses={expenses} maintenanceLogs={maintenanceLogs} />}
+              {currentTab === 'maintenance' && (
+                <Maintenance 
+                  vehicles={vehicles} 
+                  refreshData={fetchData} 
+                  activeCurrencySymbol={activeCurrencySymbol} 
+                />
+              )}
+              {currentTab === 'fuel' && (
+                <FuelExpenseManager 
+                  vehicles={vehicles} 
+                  trips={trips} 
+                  fuelLogs={fuelLogs} 
+                  expenses={expenses} 
+                  refreshData={fetchData}
+                  activeCurrencySymbol={activeCurrencySymbol}
+                />
+              )}
+              {currentTab === 'reports' && (
+                <ReportsAnalytics 
+                  vehicles={vehicles} 
+                  trips={trips} 
+                  fuelLogs={fuelLogs} 
+                  expenses={expenses} 
+                  maintenanceLogs={maintenanceLogs}
+                  activeCurrencySymbol={activeCurrencySymbol}
+                />
+              )}
+              {currentTab === 'settings' && (
+                <SettingsConfig 
+                  activeCurrencySymbol={activeCurrencySymbol} 
+                  setActiveCurrencySymbol={setActiveCurrencySymbol} 
+                />
+              )}
             </div>
           )}
         </div>
@@ -668,26 +817,3 @@ export default function App() {
     </div>
   );
 }
-
-/*
-  DESIGN NOTES — "Real SaaS platform" pass
-  --------------------------------------------------------------------------
-  Moved away from the more thematic "highway console" motif toward patterns
-  people actually recognize from Linear/Stripe/Vercel-style products:
-    - Collapsible icon-rail sidebar with a workspace/account card
-    - A real topbar: breadcrumb, live search (wired to the dashboard's
-      vehicle list), notification bell, avatar dropdown with sign-out
-    - Toast notifications (top-right, auto-dismiss) instead of browser
-      alert() popups — the one behavioral change in this pass, since native
-      alert() boxes are the biggest tell of a non-production app. The
-      success/error conditions themselves are untouched.
-    - Skeleton loading state instead of a static "loading…" line
-    - Soft layered shadows (op-card) and consistent hover lift instead of
-      flat borders, plus a subtle mount transition when switching tabs
-
-  Everything else — every useState, useEffect, fetchData, and the three
-  auth handlers' actual supabase calls and field names — is unchanged from
-  your original file. If you'd rather keep native alert() instead of
-  toasts, swap pushToast('error', msg) / pushToast('success', msg) calls
-  back to alert(msg) — nothing else depends on them.
-*/

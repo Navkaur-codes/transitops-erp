@@ -1,19 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
+import { Filter } from 'lucide-react';
 
 export default function PersonnelFiles({ drivers, refreshData }) {
+  // Local state for the mockup's interactive 'TOGGLE STAT' bar
+  const [activeStatusToggle, setActiveStatusToggle] = useState('All');
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const contactNumber = formData.get('contact_number').trim();
 
-    // Strict Validation Rule: Ensure phone numbers are between 7 to 15 digits 
-    // and only contain digits, spaces, dashes, or a leading '+' sign.
     const phoneRegex = /^\+?[0-9\s\-]{7,15}$/;
-    
     if (!phoneRegex.test(contactNumber)) {
       alert("Validation Error: Please enter a valid phone number (between 7 to 15 digits long). Short codes or 3-digit values are restricted.");
-      return; // Halts execution, preventing database insertions
+      return; 
     }
 
     const newDriver = {
@@ -41,9 +42,22 @@ export default function PersonnelFiles({ drivers, refreshData }) {
       case 'Available': return 'bg-emerald-50 text-emerald-600';
       case 'On Trip': return 'bg-sky-50 text-sky-600';
       case 'Suspended': return 'bg-red-50 text-red-600';
+      case 'Off Duty': return 'bg-slate-100 text-slate-600';
       default: return 'bg-slate-100 text-slate-500';
     }
   };
+
+  // Reactively calculate items based on active quick-toggle button context
+  // Perform strict filtration mapping based on the active quick-toggle selection context
+  const computedFilteredDrivers = drivers.filter(d => {
+    const isExpired = d.license_expiry_date ? new Date(d.license_expiry_date) < new Date() : false;
+    const effectiveStatus = isExpired ? 'Expired' : d.status;
+
+    if (activeStatusToggle === 'All') return true;
+    
+    // Enforce matching against the calculated effective status
+    return effectiveStatus === activeStatusToggle;
+  });
 
   return (
     <div className="space-y-6">
@@ -96,62 +110,87 @@ export default function PersonnelFiles({ drivers, refreshData }) {
                 <option value="Suspended">Suspended</option>
               </select>
             </div>
-            <button type="submit" className="w-full bg-gradient-to-r from-[#FF7A1A] to-[#FF9A4D] hover:from-[#FF8A33] hover:to-[#FFAA66] text-white font-bold p-3 rounded-lg text-sm transition-all active:scale-[0.98] shadow-lg shadow-[#FF7A1A]/20">
+            <button type="submit" className="w-full bg-gradient-to-r from-[#FF7A1A] to-[#FF9A4D] hover:from-[#FF8A33] hover:to-[#FFAA66] text-white font-bold p-3 rounded-lg text-sm transition-all active:scale-[0.98] shadow-lg shadow-[#FF7A1A]/20 cursor-pointer">
               Commit Profile to Ledger
             </button>
           </form>
         </div>
 
         {/* Output Table View */}
-        <div className="lg:col-span-2">
-          <div className="op-card bg-white border border-slate-200 rounded-2xl overflow-hidden">
+        <div className="lg:col-span-2 space-y-4">
+          <div className="op-card bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
             <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <span className="font-bold text-xs uppercase text-slate-500 tracking-wider">Registered Operators</span>
-              <span className="op-mono text-[11px] text-slate-400">{drivers.length} total</span>
+              <span className="op-mono text-[11px] text-slate-400">{computedFilteredDrivers.length} visible</span>
             </div>
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50/60 border-b border-slate-200 text-slate-500 text-[11px] uppercase tracking-wider">
-                  <th className="p-4 font-semibold">Operator Info</th>
-                  <th className="p-4 font-semibold">License details</th>
-                  <th className="p-4 font-semibold text-right">Safety</th>
-                  <th className="p-4 font-semibold text-center">Duty Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-sm">
-                {drivers.length === 0 ? (
-                  <tr>
-                    <td colSpan="4" className="p-10 text-center text-slate-400 font-medium">No registered operators found.</td>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse min-w-[500px]">
+                <thead>
+                  <tr className="bg-slate-50/60 border-b border-slate-200 text-slate-500 text-[11px] uppercase tracking-wider">
+                    <th className="p-4 font-semibold">Operator Info</th>
+                    <th className="p-4 font-semibold">License details</th>
+                    <th className="p-4 font-semibold text-right">Safety</th>
+                    <th className="p-4 font-semibold text-center">Duty Status</th>
                   </tr>
-                ) : (
-                  drivers.map(d => {
-                    const isExpired = d.license_expiry_date ? new Date(d.license_expiry_date) < new Date() : false;
-                    const effectiveStatus = isExpired ? 'Expired' : d.status;
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-sm">
+                  {computedFilteredDrivers.length === 0 ? (
+                    <tr>
+                      <td colSpan="4" className="p-10 text-center text-slate-400 font-medium">No registered operators match the active filter criteria.</td>
+                    </tr>
+                  ) : (
+                    computedFilteredDrivers.map(d => {
+                      const isExpired = d.license_expiry_date ? new Date(d.license_expiry_date) < new Date() : false;
+                      const effectiveStatus = isExpired ? 'Expired' : d.status;
 
-                    return (
-                      <tr key={d.id} className="hover:bg-slate-50 transition-colors">
-                        <td className="p-4">
-                          <div className="font-bold text-slate-900">{d.name}</div>
-                          <div className="text-xs text-slate-400">{d.contact_number}</div>
-                        </td>
-                        <td className="p-4">
-                          <span className="text-[11px] bg-slate-900 px-2 py-0.5 rounded op-mono text-slate-200">{d.license_number}</span>
-                          <div className={`text-[11px] mt-1 ${isExpired ? 'text-amber-600 font-semibold' : 'text-slate-400'}`}>
-                            {d.license_category} • Exp: {d.license_expiry_date} {isExpired && '⚠️'}
-                          </div>
-                        </td>
-                        <td className="p-4 text-right op-mono font-bold text-slate-700">{d.safety_score}/100</td>
-                        <td className="p-4 text-center">
-                          <span className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-bold ${statusBadge(effectiveStatus)}`}>
-                            {effectiveStatus}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
+                      return (
+                        <tr key={d.id} className="hover:bg-slate-50 transition-colors">
+                          <td className="p-4">
+                            <div className="font-bold text-slate-900">{d.name}</div>
+                            <div className="text-xs text-slate-400">{d.contact_number}</div>
+                          </td>
+                          <td className="p-4">
+                            <span className="text-[11px] bg-slate-900 px-2 py-0.5 rounded op-mono text-slate-200">{d.license_number}</span>
+                            <div className={`text-[11px] mt-1 ${isExpired ? 'text-amber-600 font-semibold' : 'text-slate-400'}`}>
+                              {d.license_category} • Exp: {d.license_expiry_date} {isExpired && '⚠️'}
+                            </div>
+                          </td>
+                          <td className="p-4 text-right op-mono font-bold text-slate-700">{d.safety_score}/100</td>
+                          <td className="p-4 text-center">
+                            <span className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-bold ${statusBadge(effectiveStatus)}`}>
+                              {effectiveStatus}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mockup Quick Toggle Status Button Filters Bar */}
+            <div className="p-4 bg-slate-50 border-t border-slate-100 flex flex-wrap gap-2 items-center justify-between">
+              <span className="text-xs font-bold text-slate-400 uppercase font-mono tracking-wider">Toggle Stat:</span>
+              <div className="flex flex-wrap gap-1.5">
+                {['All', 'Available', 'On Trip', 'Off Duty', 'Suspended', 'Expired'].map(status => (
+                  <button
+                    key={status}
+                    type="button"
+                    onClick={() => setActiveStatusToggle(status)}
+                    className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${
+                      activeStatusToggle === status
+                        ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
+                        : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
+                    }`}
+                  >
+                    {status}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            
           </div>
         </div>
       </div>
