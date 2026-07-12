@@ -1,5 +1,5 @@
 import React from 'react';
-import { Download } from 'lucide-react';
+import { Download, TrendingUp } from 'lucide-react';
 
 export default function ReportsAnalytics({ vehicles, trips, fuelLogs, expenses, maintenanceLogs }) {
   
@@ -38,20 +38,26 @@ export default function ReportsAnalytics({ vehicles, trips, fuelLogs, expenses, 
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-wrap gap-4 justify-between items-center">
         <div>
-          <h2 className="text-3xl font-black tracking-tight">System Performance Analytics</h2>
-          <p className="text-slate-400 text-sm">Dynamic evaluation formulas and metric logs calculation.</p>
+          <h2 className="text-[28px] font-extrabold tracking-tight text-slate-900">System Performance Analytics</h2>
+          <p className="text-slate-500 text-sm mt-1">Dynamic evaluation formulas and metric logs calculation.</p>
         </div>
-        <button onClick={exportFleetDataCSV} className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs p-3 rounded-xl flex items-center gap-2 transition-all shadow-md">
+        <button onClick={exportFleetDataCSV} className="bg-gradient-to-r from-[#FF7A1A] to-[#FF9A4D] hover:from-[#FF8A33] hover:to-[#FFAA66] text-white font-bold text-xs px-4 py-3 rounded-xl flex items-center gap-2 transition-all active:scale-[0.98] shadow-lg shadow-[#FF7A1A]/20">
           <Download size={14} /> Export CSV Matrix Ledger
         </button>
       </div>
 
-      <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-md">
+      <div className="op-card bg-white border border-slate-200 rounded-2xl overflow-hidden">
+        <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+          <span className="font-bold text-xs uppercase text-slate-500 tracking-wider flex items-center gap-1.5">
+            <TrendingUp size={13} className="text-[#FF7A1A]" /> Per-Asset Financial Breakdown
+          </span>
+          <span className="op-mono text-[11px] text-slate-400">{vehicles.length} assets</span>
+        </div>
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-slate-800/50 border-b border-slate-800 text-slate-400 text-xs uppercase tracking-wider">
+            <tr className="bg-slate-50/60 border-b border-slate-200 text-slate-500 text-[11px] uppercase tracking-wider">
               <th className="p-4 font-semibold">Fleet Asset</th>
               <th className="p-4 font-semibold text-right">Fuel Consumed</th>
               <th className="p-4 font-semibold text-right">Maintenance Book</th>
@@ -59,8 +65,7 @@ export default function ReportsAnalytics({ vehicles, trips, fuelLogs, expenses, 
               <th className="p-4 font-semibold text-center">Calculated Asset ROI (%)</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800 text-sm">
-            // Replace your existing vehicles.map loop inside src/components/ReportsAnalytics.jsx with this fully loaded metric row layout:
+          <tbody className="divide-y divide-slate-100 text-sm">
 
           {vehicles.map(v => {
             const fuelRows = fuelLogs.filter(f => f.vehicle_id === v.id);
@@ -79,19 +84,19 @@ export default function ReportsAnalytics({ vehicles, trips, fuelLogs, expenses, 
             const fuelEfficiency = totalLiters > 0 ? (totalDistance / totalLiters).toFixed(1) : "0.0";
 
             return (
-              <tr key={v.id} className="hover:bg-slate-800/20 transition-colors">
+              <tr key={v.id} className="hover:bg-slate-50 transition-colors">
                 <td className="p-4">
-                  <div className="font-bold text-white">{v.name}</div>
-                  <div className="text-xs text-slate-500 font-mono">{v.license_plate}</div>
+                  <div className="font-bold text-slate-900">{v.name}</div>
+                  <span className="text-[11px] bg-slate-900 px-2 py-0.5 rounded op-mono text-slate-200 inline-block mt-1">{v.license_plate}</span>
                 </td>
-                <td className="p-4 text-right text-slate-300 font-mono">
+                <td className="p-4 text-right text-slate-700 op-mono">
                   <div>${fuelCost.toFixed(2)}</div>
-                  <div className="text-[10px] text-slate-500">{fuelEfficiency} km/L</div>
+                  <div className="text-[10px] text-slate-400">{fuelEfficiency} km/L</div>
                 </td>
-                <td className="p-4 text-right text-slate-300 font-mono">${maintCost.toFixed(2)}</td>
-                <td className="p-4 text-right text-emerald-400 font-mono">${calculatedRevenue.toFixed(2)}</td>
+                <td className="p-4 text-right text-slate-700 op-mono">${maintCost.toFixed(2)}</td>
+                <td className="p-4 text-right text-emerald-600 op-mono font-semibold">${calculatedRevenue.toFixed(2)}</td>
                 <td className="p-4 text-center font-bold">
-                  <span className={`px-3 py-1 rounded-full font-mono text-xs ${assetROI >= 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
+                  <span className={`px-3 py-1 rounded-full op-mono text-xs ${assetROI >= 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
                     {assetROI.toFixed(1)}%
                   </span>
                 </td>

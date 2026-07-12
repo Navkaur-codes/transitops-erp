@@ -1,102 +1,210 @@
 @import "tailwindcss";
 
-/* 1. Global Baseline Ambience Settings */
-html, body {
-  background-color: #030712;
-  color: #f1f5f9;
-  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+/* ==========================================
+   GLOBAL THEME
+========================================== */
+
+html,
+body {
+  background: #f8fafc;
+  color: #0f172a;
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-image: 
-    radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(79, 70, 229, 0.05) 0px, transparent 50%);
 }
 
-/* 2. Compliant Tailwind v4 Custom Utility Directives */
-@utility glass-panel {
-  background-color: rgba(15, 23, 42, 0.4);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(30, 41, 59, 0.8);
-  border-radius: 1rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 300ms;
+/* ==========================================
+   GLASS PANEL
+========================================== */
 
-  /* Standard CSS Nesting handles states in v4 */
+@utility glass-panel {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 10px 25px rgba(15, 23, 42, 0.06),
+    0 2px 8px rgba(15, 23, 42, 0.04);
+
+  transition: all .25s ease;
+}
+
+@utility glass-panel-hover {
   &:hover {
-    border-color: rgba(51, 65, 85, 0.6);
+    transform: translateY(-2px);
+    box-shadow:
+      0 18px 35px rgba(15, 23, 42, .10),
+      0 6px 14px rgba(15, 23, 42, .06);
   }
 }
+
+/* ==========================================
+   INPUTS
+========================================== */
 
 @utility cyber-input {
   width: 100%;
-  background-color: rgba(2, 6, 23, 0.8);
-  border: 1px solid rgba(30, 41, 59, 0.8);
-  color: #ffffff;
-  border-radius: 0.75rem;
-  padding: 0.875rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 200ms;
+
+  background: #ffffff;
+
+  border: 1px solid #cbd5e1;
+
+  color: #0f172a;
+
+  border-radius: 12px;
+
+  padding: .85rem 1rem;
+
+  font-size: .95rem;
+
+  transition: all .2s ease;
+
   outline: none;
 
   &:focus {
-    border-color: rgba(16, 185, 129, 0.8);
-    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37,99,235,.12);
+  }
+
+  &::placeholder{
+    color:#94a3b8;
   }
 }
+
+/* ==========================================
+   NAVIGATION
+========================================== */
 
 @utility nav-btn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 0.875rem;
-  padding: 0.875rem 1rem;
-  border-radius: 0.75rem;
-  font-weight: 700;
-  font-size: 0.875rem;
-  letter-spacing: 0.025em;
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 200ms;
-  position: relative;
-  overflow: hidden;
-}
 
-@utility kpi-card {
-  background-image: linear-gradient(to bottom, rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.2));
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(30, 41, 59, 0.8);
-  padding: 1.25rem;
-  border-radius: 1rem;
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 300ms;
-  position: relative;
-  overflow: hidden;
+  width:100%;
 
-  &:hover {
-    transform: translateY(-2px);
+  display:flex;
+
+  align-items:center;
+
+  gap:.9rem;
+
+  padding:.9rem 1rem;
+
+  border-radius:14px;
+
+  color:#475569;
+
+  font-weight:600;
+
+  transition:all .25s ease;
+
+  cursor:pointer;
+
+  &:hover{
+
+      background:#eff6ff;
+
+      color:#2563eb;
+
+      transform:translateX(3px);
+
   }
 }
 
-/* 3. Custom Work Environment Scrollbars */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+@utility nav-btn-active{
+
+    background:linear-gradient(
+        90deg,
+        #2563eb,
+        #3b82f6
+    );
+
+    color:white;
+
+    box-shadow:
+    0 10px 25px rgba(37,99,235,.25);
+
 }
-::-webkit-scrollbar-track {
-  background: #030712;
+
+/* ==========================================
+   KPI CARD
+========================================== */
+
+@utility kpi-card {
+
+    background:white;
+
+    border:1px solid #e2e8f0;
+
+    border-radius:18px;
+
+    padding:1.4rem;
+
+    transition:all .25s ease;
+
+    box-shadow:
+    0 4px 14px rgba(15,23,42,.05);
+
+    &:hover{
+
+        transform:translateY(-4px);
+
+        box-shadow:
+        0 20px 35px rgba(15,23,42,.08);
+
+    }
+
 }
-::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 99px;
+
+/* ==========================================
+   TABLE
+========================================== */
+
+@utility table-container{
+
+    background:white;
+
+    border-radius:18px;
+
+    border:1px solid #e2e8f0;
+
+    overflow:hidden;
+
+    box-shadow:
+    0 4px 12px rgba(15,23,42,.05);
+
 }
-::-webkit-scrollbar-thumb:hover {
-  background: #10b981;
+
+/* ==========================================
+   BUTTONS
+========================================== */
+
+@utility primary-btn{
+
+    background:linear-gradient(
+        135deg,
+        #2563eb,
+        #3b82f6
+    );
+
+    color:white;
+
+    border-radius:12px;
+
+    padding:.75rem 1.2rem;
+
+    font-weight:600;
+
+    transition:.25s;
+
+    &:hover{
+
+        transform:translateY(-2px);
+
+        box-shadow:
+        0 12px 25px rgba(37,99,235,.25);
+
+    }
+
 }

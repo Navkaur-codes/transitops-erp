@@ -74,19 +74,22 @@ export default function Maintenance({ vehicles, refreshData }) {
   const maintainableVehicles = vehicles.filter(v => v.status === 'Available' || v.status === 'On Trip');
 
   return (
-    <div>
-      <h2 className="text-3xl font-extrabold tracking-tight mb-8">Maintenance Workshop Logs</h2>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-[28px] font-extrabold tracking-tight text-slate-900">Maintenance Workshop Logs</h2>
+        <p className="text-slate-500 text-sm mt-1">Check assets into the shop and close out completed repairs.</p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Open Ticket Form */}
-        <div className="bg-slate-900 border border-slate-800 p-6 rounded-xl shadow-md h-fit">
-          <h3 className="text-xl font-bold mb-4 text-emerald-400 flex items-center gap-2">
-            <Wrench size={18} /> Issue Workshop Ticket
+        <div className="op-card bg-white border border-slate-200 p-6 rounded-2xl h-fit">
+          <h3 className="text-[15px] font-bold text-slate-900 mb-5 flex items-center gap-2">
+            <Wrench size={16} className="text-[#FF7A1A]" /> Issue Workshop Ticket
           </h3>
           <form onSubmit={handleOpenMaintenance} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Select Target Vehicle</label>
-              <select name="vehicle_id" required className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
+              <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Select Target Vehicle</label>
+              <select name="vehicle_id" required className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm text-slate-800 focus:outline-none focus:border-[#FF7A1A] focus:bg-white transition-colors">
                 <option value="">-- Choose Asset --</option>
                 {maintainableVehicles.map(v => (
                   <option key={v.id} value={v.id}>{v.name} ({v.license_plate}) - Current: {v.status}</option>
@@ -94,14 +97,14 @@ export default function Maintenance({ vehicles, refreshData }) {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Service Description</label>
-              <input name="description" type="text" placeholder="e.g. Oil Change & Brake Pad Replacement" required className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:outline-none focus:border-emerald-500 text-white" />
+              <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Service Description</label>
+              <input name="description" type="text" placeholder="e.g. Oil Change & Brake Pad Replacement" required className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#FF7A1A] focus:bg-white transition-colors" />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Estimated Maintenance Cost ($)</label>
-              <input name="cost" type="number" step="0.01" placeholder="e.g. 150.00" required className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:outline-none focus:border-emerald-500 text-white" />
+              <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Estimated Maintenance Cost ($)</label>
+              <input name="cost" type="number" step="0.01" placeholder="e.g. 150.00" required className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#FF7A1A] focus:bg-white transition-colors" />
             </div>
-            <button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3 rounded-lg text-sm transition-colors shadow-sm">
+            <button type="submit" className="w-full bg-gradient-to-r from-[#FF7A1A] to-[#FF9A4D] hover:from-[#FF8A33] hover:to-[#FFAA66] text-white font-bold p-3 rounded-lg text-sm transition-all active:scale-[0.98] shadow-lg shadow-[#FF7A1A]/20">
               Authorize Shop Check-in
             </button>
           </form>
@@ -109,35 +112,36 @@ export default function Maintenance({ vehicles, refreshData }) {
 
         {/* Output Table View */}
         <div className="lg:col-span-2">
-          <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-md">
-            <div className="p-4 bg-slate-800/30 border-b border-slate-800">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Service & Repair Records</span>
+          <div className="op-card bg-white border border-slate-200 rounded-2xl overflow-hidden">
+            <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Active Service & Repair Records</span>
+              <span className="op-mono text-[11px] text-slate-400">{logs.length} total</span>
             </div>
-            <div className="divide-y divide-slate-800/60 text-sm">
+            <div className="divide-y divide-slate-100 text-sm">
               {loading ? (
-                <div className="p-6 text-center text-slate-500">Syncing workshop files...</div>
+                <div className="p-10 text-center text-slate-400">Syncing workshop files…</div>
               ) : logs.length === 0 ? (
-                <div className="p-8 text-center text-slate-500 font-medium">No maintenance logs found.</div>
+                <div className="p-10 text-center text-slate-400 font-medium">No maintenance logs found.</div>
               ) : (
                 logs.map(log => {
                   const v = vehicles.find(veh => veh.id === log.vehicle_id);
                   return (
-                    <div key={log.id} className="p-4 flex items-center justify-between gap-4 hover:bg-slate-800/20 transition-colors">
+                    <div key={log.id} className="p-4 flex items-center justify-between gap-4 hover:bg-slate-50 transition-colors">
                       <div>
-                        <div className="font-bold text-white text-sm flex items-center gap-2">
+                        <div className="font-bold text-slate-900 text-sm flex items-center gap-2 flex-wrap">
                           <span>{v?.name || 'Unknown Asset'} ({v?.license_plate || 'N/A'})</span>
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
-                            log.status === 'Open' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20'
+                          <span className={`text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${
+                            log.status === 'Open' ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'
                           }`}>
                             {log.status === 'Open' ? 'In Shop' : 'Completed'}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-400 mt-1">{log.description}</p>
-                        <p className="text-[11px] text-slate-500 font-mono mt-0.5">Cost: ${Number(log.cost).toFixed(2)} • Date: {log.log_date}</p>
+                        <p className="text-xs text-slate-500 mt-1">{log.description}</p>
+                        <p className="text-[11px] text-slate-400 op-mono mt-0.5">Cost: ${Number(log.cost).toFixed(2)} • Date: {log.log_date}</p>
                       </div>
 
                       {log.status === 'Open' && (
-                        <button onClick={() => handleCloseMaintenance(log)} className="bg-emerald-600/15 text-emerald-400 border border-emerald-500/20 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-emerald-600 hover:text-white transition-colors flex items-center gap-1 shrink-0">
+                        <button onClick={() => handleCloseMaintenance(log)} className="bg-emerald-50 text-emerald-600 border border-emerald-200 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-colors flex items-center gap-1 shrink-0">
                           <CheckCircle size={12} /> Complete Repair
                         </button>
                       )}

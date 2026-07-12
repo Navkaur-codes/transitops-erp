@@ -126,28 +126,39 @@ export default function ActiveDispatch({ vehicles, drivers, trips, refreshData }
     }
   };
 
+  const statusBadge = (status) => {
+    switch (status) {
+      case 'Draft': return 'bg-slate-100 text-slate-500';
+      case 'Dispatched': return 'bg-sky-50 text-sky-600';
+      case 'Completed': return 'bg-emerald-50 text-emerald-600';
+      default: return 'bg-red-50 text-red-600';
+    }
+  };
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-extrabold tracking-tight mb-2">Trip Manifest Controller</h2>
-        <p className="text-slate-400 text-sm">Schedule routes, monitor active lifecycle states, and input completion parameters.</p>
+        <h2 className="text-[28px] font-extrabold tracking-tight text-slate-900">Trip Manifest Controller</h2>
+        <p className="text-slate-500 text-sm mt-1">Schedule routes, monitor active lifecycle states, and input completion parameters.</p>
       </div>
 
       {errorMsg && (
-        <div className="bg-red-950/40 border border-red-900/50 p-4 rounded-xl flex items-start gap-3 text-red-400 text-sm shadow-sm">
+        <div className="op-card bg-red-50 border border-red-200 p-4 rounded-xl flex items-start gap-3 text-red-600 text-sm">
           <ShieldAlert size={20} className="shrink-0 mt-0.5" />
           <span className="font-semibold">{errorMsg}</span>
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Creation Manifest Interface Form */}
-        <div className="bg-slate-900 border border-slate-800 p-6 rounded-xl shadow-md h-fit">
-          <h3 className="text-xl font-bold mb-4 text-emerald-400">Create New Route</h3>
+        <div className="op-card bg-white border border-slate-200 p-6 rounded-2xl h-fit">
+          <h3 className="text-[15px] font-bold text-slate-900 mb-5 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#FF7A1A]" /> Create New Route
+          </h3>
           <form className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Assign Fleet Unit</label>
-              <select name="vehicle_id" required className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
+              <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Assign Fleet Unit</label>
+              <select name="vehicle_id" required className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm text-slate-800 focus:outline-none focus:border-[#FF7A1A] focus:bg-white transition-colors">
                 <option value="">-- Choose Available Vehicle --</option>
                 {availableVehicles.map(v => (
                   <option key={v.id} value={v.id}>{v.name} (Max: {v.max_load_kg}kg • Current Odo: {v.odometer}km)</option>
@@ -155,8 +166,8 @@ export default function ActiveDispatch({ vehicles, drivers, trips, refreshData }
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Assign Eligible Operator</label>
-              <select name="driver_id" required className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:outline-none focus:border-emerald-500 text-white">
+              <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Assign Eligible Operator</label>
+              <select name="driver_id" required className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm text-slate-800 focus:outline-none focus:border-[#FF7A1A] focus:bg-white transition-colors">
                 <option value="">-- Choose Available Driver --</option>
                 {availableDrivers.map(d => (
                   <option key={d.id} value={d.id}>{d.name} (Score: {d.safety_score})</option>
@@ -165,30 +176,30 @@ export default function ActiveDispatch({ vehicles, drivers, trips, refreshData }
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Source Location</label>
-                <input name="source" type="text" placeholder="Warehouse A" required className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:outline-none focus:border-emerald-500" />
+                <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Source Location</label>
+                <input name="source" type="text" placeholder="Warehouse A" required className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#FF7A1A] focus:bg-white transition-colors" />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Destination</label>
-                <input name="destination" type="text" placeholder="Terminal B" required className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:outline-none focus:border-emerald-500" />
+                <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Destination</label>
+                <input name="destination" type="text" placeholder="Terminal B" required className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#FF7A1A] focus:bg-white transition-colors" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Cargo Weight (kg)</label>
-                <input name="cargo_weight_kg" type="number" placeholder="450" required className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:outline-none focus:border-emerald-500" />
+                <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Cargo Weight (kg)</label>
+                <input name="cargo_weight_kg" type="number" placeholder="450" required className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#FF7A1A] focus:bg-white transition-colors" />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Planned Distance (km)</label>
-                <input name="planned_distance" type="number" placeholder="120" required className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:outline-none focus:border-emerald-500" />
+                <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Planned Distance (km)</label>
+                <input name="planned_distance" type="number" placeholder="120" required className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#FF7A1A] focus:bg-white transition-colors" />
               </div>
             </div>
 
-            <div className="flex gap-4 pt-2">
-              <button type="button" onClick={(e) => handleCreateTrip(e.target.form ? {preventDefault:()=>{}, target:e.target.form} : e, 'Draft')} className="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold p-3 rounded-lg text-xs border border-slate-700 transition-colors">
-                Save as Draft
+            <div className="flex gap-3 pt-2">
+              <button type="button" onClick={(e) => handleCreateTrip(e.target.form ? {preventDefault:()=>{}, target:e.target.form} : e, 'Draft')} className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold p-3 rounded-lg text-xs border border-slate-200 transition-colors flex items-center justify-center gap-1.5">
+                <FileText size={13} /> Save as Draft
               </button>
-              <button type="button" onClick={(e) => handleCreateTrip(e.target.form ? {preventDefault:()=>{}, target:e.target.form} : e, 'Dispatched')} className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3 rounded-lg text-xs transition-colors flex items-center justify-center gap-1 shadow-sm">
+              <button type="button" onClick={(e) => handleCreateTrip(e.target.form ? {preventDefault:()=>{}, target:e.target.form} : e, 'Dispatched')} className="flex-1 bg-gradient-to-r from-[#FF7A1A] to-[#FF9A4D] hover:from-[#FF8A33] hover:to-[#FFAA66] text-white font-bold p-3 rounded-lg text-xs transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 shadow-lg shadow-[#FF7A1A]/20">
                 <Play size={14} fill="currentColor" /> Dispatch Route
               </button>
             </div>
@@ -198,22 +209,24 @@ export default function ActiveDispatch({ vehicles, drivers, trips, refreshData }
         {/* Live Route Lifecycle Monitor Panel */}
         <div className="lg:col-span-2 space-y-4">
           {closingTripId && (
-            <div className="bg-slate-900 border border-emerald-800/60 p-6 rounded-xl shadow-md">
-              <h4 className="text-lg font-bold mb-3 text-emerald-400">Complete Trip Manifest Parameters</h4>
+            <div className="op-card bg-white border border-sky-200 p-6 rounded-2xl">
+              <h4 className="text-[15px] font-bold mb-4 text-sky-600 flex items-center gap-2">
+                <CheckCircle2 size={16} /> Complete Trip Manifest Parameters
+              </h4>
               <form onSubmit={handleCompleteTrip} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 uppercase mb-2">Final Odometer Reading (km)</label>
-                  <input name="final_odometer" type="number" required className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:outline-none focus:border-emerald-500" />
+                  <label className="block text-[11px] font-semibold text-slate-500 uppercase mb-1.5">Final Odometer Reading (km)</label>
+                  <input name="final_odometer" type="number" required className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm text-slate-800 focus:outline-none focus:border-sky-400 focus:bg-white transition-colors" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 uppercase mb-2">Total Fuel Consumed (Liters)</label>
-                  <input name="fuel_consumed" type="number" step="0.01" required className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:outline-none focus:border-emerald-500" />
+                  <label className="block text-[11px] font-semibold text-slate-500 uppercase mb-1.5">Total Fuel Consumed (Liters)</label>
+                  <input name="fuel_consumed" type="number" step="0.01" required className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm text-slate-800 focus:outline-none focus:border-sky-400 focus:bg-white transition-colors" />
                 </div>
                 <div className="flex gap-2">
-                  <button type="submit" className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3 rounded-lg text-sm transition-colors">
+                  <button type="submit" className="flex-1 bg-sky-600 hover:bg-sky-500 text-white font-bold p-3 rounded-lg text-sm transition-colors shadow-sm">
                     Save Closeout
                   </button>
-                  <button type="button" onClick={() => setClosingTripId(null)} className="bg-slate-800 text-slate-400 p-3 rounded-lg text-sm border border-slate-700">
+                  <button type="button" onClick={() => setClosingTripId(null)} className="bg-slate-100 hover:bg-slate-200 text-slate-500 p-3 rounded-lg text-sm border border-slate-200 transition-colors">
                     Cancel
                   </button>
                 </div>
@@ -221,50 +234,46 @@ export default function ActiveDispatch({ vehicles, drivers, trips, refreshData }
             </div>
           )}
 
-          <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-md">
-            <div className="p-4 bg-slate-800/30 border-b border-slate-800">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Operational Lifecycle Registry</span>
+          <div className="op-card bg-white border border-slate-200 rounded-2xl overflow-hidden">
+            <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Operational Lifecycle Registry</span>
+              <span className="op-mono text-[11px] text-slate-400">{trips.length} total</span>
             </div>
-            <div className="divide-y divide-slate-800/60 text-sm">
+            <div className="divide-y divide-slate-100 text-sm">
               {trips.length === 0 ? (
-                <div className="p-8 text-center text-slate-500 font-medium">No route records recorded in workspace memory.</div>
+                <div className="p-10 text-center text-slate-400 font-medium">No route records recorded in workspace memory.</div>
               ) : (
                 trips.map(t => {
                   const v = vehicles.find(veh => veh.id === t.vehicle_id);
                   const d = drivers.find(drv => drv.id === t.driver_id);
                   return (
-                    <div key={t.id} className="p-5 flex flex-col md:flex-row justify-between md:items-center gap-4 hover:bg-slate-800/20 transition-colors">
+                    <div key={t.id} className="p-5 flex flex-col md:flex-row justify-between md:items-center gap-4 hover:bg-slate-50 transition-colors">
                       <div>
-                        <div className="font-bold text-white text-base flex items-center flex-wrap gap-2">
+                        <div className="font-bold text-slate-900 text-[15px] flex items-center flex-wrap gap-2">
                           <span>{t.source} ➔ {t.destination}</span>
-                          <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${
-                            t.status === 'Draft' ? 'bg-slate-800 text-slate-400 border-slate-700' :
-                            t.status === 'Dispatched' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-                            t.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
-                            'bg-red-500/10 text-red-400 border border-red-500/20'
-                          }`}>
+                          <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${statusBadge(t.status)}`}>
                             {t.status}
                           </span>
                         </div>
-                        <div className="text-xs text-slate-400 mt-1">
-                          <span className="font-semibold text-slate-300">Asset:</span> {v?.name || 'Unknown'} ({v?.license_plate}) | 
-                          <span className="font-semibold text-slate-300"> Operator:</span> {d?.name || 'Unknown'} | 
-                          <span className="font-semibold text-slate-300"> Load:</span> {t.cargo_weight_kg}kg
+                        <div className="text-xs text-slate-500 mt-1">
+                          <span className="font-semibold text-slate-600">Asset:</span> {v?.name || 'Unknown'} ({v?.license_plate}) | 
+                          <span className="font-semibold text-slate-600"> Operator:</span> {d?.name || 'Unknown'} | 
+                          <span className="font-semibold text-slate-600"> Load:</span> {t.cargo_weight_kg}kg
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-3 self-end md:self-auto">
+                      <div className="flex items-center gap-2 self-end md:self-auto">
                         {t.status === 'Draft' && (
-                          <button onClick={() => changeStatus(t, 'Dispatched')} className="bg-emerald-600/10 text-emerald-400 border border-emerald-500/20 font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-emerald-600 hover:text-white transition-colors">
+                          <button onClick={() => changeStatus(t, 'Dispatched')} className="bg-emerald-50 text-emerald-600 border border-emerald-200 font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-colors">
                             Authorize Dispatch
                           </button>
                         )}
                         {t.status === 'Dispatched' && (
                           <>
-                            <button onClick={() => setClosingTripId(t.id)} className="bg-blue-600/10 text-blue-400 border border-blue-500/20 font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition-colors flex items-center gap-1">
+                            <button onClick={() => setClosingTripId(t.id)} className="bg-sky-50 text-sky-600 border border-sky-200 font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-sky-600 hover:text-white hover:border-sky-600 transition-colors flex items-center gap-1">
                               <CheckCircle2 size={12} /> Complete
                             </button>
-                            <button onClick={() => changeStatus(t, 'Cancelled')} className="bg-red-600/10 text-red-400 border border-red-500/20 font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-colors flex items-center gap-1">
+                            <button onClick={() => changeStatus(t, 'Cancelled')} className="bg-red-50 text-red-600 border border-red-200 font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white hover:border-red-600 transition-colors flex items-center gap-1">
                               <XCircle size={12} /> Cancel
                             </button>
                           </>
