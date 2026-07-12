@@ -60,32 +60,44 @@ export default function ReportsAnalytics({ vehicles, trips, fuelLogs, expenses, 
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800 text-sm">
-            {vehicles.map(v => {
-              const fuelCost = fuelLogs.filter(f => f.vehicle_id === v.id).reduce((sum, item) => sum + (Number(item.cost) || 0), 0);
-              const maintCost = maintenanceLogs.filter(m => m.vehicle_id === v.id).reduce((sum, item) => sum + (Number(item.cost) || 0), 0);
-              const assetTrips = trips.filter(t => t.vehicle_id === v.id && t.status === 'Completed');
-              const calculatedRevenue = assetTrips.reduce((sum, t) => sum + ((Number(t.cargo_weight_kg) / 1000) * Number(t.planned_distance) * 12.5), 0);
-              
-              const acqCost = Number(v.acquisition_cost) || 1;
-              const assetROI = ((calculatedRevenue - (maintCost + fuelCost)) / acqCost) * 100;
+            // Replace your existing vehicles.map loop inside src/components/ReportsAnalytics.jsx with this fully loaded metric row layout:
 
-              return (
-                <tr key={v.id} className="hover:bg-slate-800/20 transition-colors">
-                  <td className="p-4">
-                    <div className="font-bold text-white">{v.name}</div>
-                    <div className="text-xs text-slate-500 font-mono">{v.license_plate}</div>
-                  </td>
-                  <td className="p-4 text-right text-slate-300 font-mono">${fuelCost.toFixed(2)}</td>
-                  <td className="p-4 text-right text-slate-300 font-mono">${maintCost.toFixed(2)}</td>
-                  <td className="p-4 text-right text-emerald-400 font-mono">${calculatedRevenue.toFixed(2)}</td>
-                  <td className="p-4 text-center font-bold">
-                    <span className={`px-3 py-1 rounded-full font-mono text-xs ${assetROI >= 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
-                      {assetROI.toFixed(1)}%
-                    </span>
-                  </td>
-                </tr>
-              );
-            })}
+          {vehicles.map(v => {
+            const fuelRows = fuelLogs.filter(f => f.vehicle_id === v.id);
+            const totalLiters = fuelRows.reduce((sum, item) => sum + (Number(item.liters) || 0), 0);
+            const fuelCost = fuelRows.reduce((sum, item) => sum + (Number(item.cost) || 0), 0);
+            const maintCost = maintenanceLogs.filter(m => m.vehicle_id === v.id).reduce((sum, item) => sum + (Number(item.cost) || 0), 0);
+            
+            const assetTrips = trips.filter(t => t.vehicle_id === v.id && t.status === 'Completed');
+            const totalDistance = assetTrips.reduce((sum, t) => sum + (Number(t.planned_distance) || 0), 0);
+            const calculatedRevenue = assetTrips.reduce((sum, t) => sum + ((Number(t.cargo_weight_kg) / 1000) * Number(t.planned_distance) * 12.5), 0);
+            
+            const acqCost = Number(v.acquisition_cost) || 1;
+            const assetROI = ((calculatedRevenue - (maintCost + fuelCost)) / acqCost) * 100;
+            
+            // Calculate dynamic Fuel Efficiency (Distance / Fuel Liters)
+            const fuelEfficiency = totalLiters > 0 ? (totalDistance / totalLiters).toFixed(1) : "0.0";
+
+            return (
+              <tr key={v.id} className="hover:bg-slate-800/20 transition-colors">
+                <td className="p-4">
+                  <div className="font-bold text-white">{v.name}</div>
+                  <div className="text-xs text-slate-500 font-mono">{v.license_plate}</div>
+                </td>
+                <td className="p-4 text-right text-slate-300 font-mono">
+                  <div>${fuelCost.toFixed(2)}</div>
+                  <div className="text-[10px] text-slate-500">{fuelEfficiency} km/L</div>
+                </td>
+                <td className="p-4 text-right text-slate-300 font-mono">${maintCost.toFixed(2)}</td>
+                <td className="p-4 text-right text-emerald-400 font-mono">${calculatedRevenue.toFixed(2)}</td>
+                <td className="p-4 text-center font-bold">
+                  <span className={`px-3 py-1 rounded-full font-mono text-xs ${assetROI >= 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
+                    {assetROI.toFixed(1)}%
+                  </span>
+                </td>
+              </tr>
+            );
+          })}
           </tbody>
         </table>
       </div>
